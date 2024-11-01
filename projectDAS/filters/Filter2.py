@@ -1,50 +1,79 @@
 import os.path
-import time
+
+import pandas as pd
 
 from projectDAS.filters.Filter import *
 
 class SaveDataFilter(Filter):
-    async def process(self, driver, data):
+    def process(self, data):
         print("Filter 2 starting...")
+        num_threads = 3
+        chunk_size = ceil(len(data) / num_threads)
+        data_chunks = [data[i:i + chunk_size] for i in range(0, len(data), chunk_size)]
+
+        all_dates = {}
+        with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+            # Submit each data chunk to a separate thread
+            futures = [executor.submit(self.process_companies_subset, chunk) for chunk in data_chunks]
+
+            # Collect results as they complete
+            for future in concurrent.futures.as_completed(futures):
+                all_dates.update(future.result())
+                print(all_dates)
+
+        return all_dates
+
+    def process_companies_subset(self, companies_subset):
         dates = {}
-        for company in data:
-            print(company)
-            await change_company_code(driver, company)
-            await change_input_values(driver, datetime.now())
+        driver = get_driver()
+        print(companies_subset)
+        for company in companies_subset:
+            change_company_code(driver, company)
+            change_input_values(driver, datetime.now())
 
             if check_existing_data(company):
-                print('Getting last date')
-                dates[company] = await self.get_last_date(company)
-                print(dates[company])
+                dates[company] = self.get_last_date(company)
             else:
                 dates[company] = transform_date_to_string(datetime.now())
-                await self.save_last_10_years(driver, company)
-        print(len(dates), len(data))
+                self.save_last_10_years(driver, company)
 
-        return driver, dates
+        driver.quit()
+        return dates
 
-    async def get_last_date(self, company_name):
+    def get_last_date(self, company_name):
         path = os.path.join('..', 'database', f'{company_name}.xlsx')
         df = pd.read_excel(path)
         return df.iloc[0, 0]
 
-    async def save_last_10_years(self, driver, company_name):
+    def save_last_10_years(self, driver, company_name):
+        output_dir = os.path.join('..', 'database', f'{company_name}.xlsx')
+        tmp = {
+            "Датум": [],
+            "Цена на последна трансакција": [],
+            "Мак.": [],
+            "Мин.": [],
+            "Просечна цена": [],
+            "%пром.": [],
+            "Количина": [],
+            "Промет во БЕСТ во денари": [],
+            "Вкупен промет во денари": [],
+        }
+        excelce = pd.DataFrame(tmp)
         for i in range(10):
             print(i, company_name)
 
-            await self.change_date(driver, i)
+            self.change_date(driver, i)
             time.sleep(3)
-            df = await get_df(driver)
+            df = get_df(driver)
+            if df is None:
+                print("Found None in " + i + " " + company_name)
+                break
 
-            output_dir = os.path.join('..', 'database', f'{company_name}.xlsx')
-            if not os.path.exists(output_dir):
-                df.to_excel(output_dir, index=False)
-            else:
-                read = pd.read_excel(output_dir)
-                combined = pd.concat([read, df], ignore_index=True) # read e prvo pa posle df
-                combined.to_excel(output_dir, index=False)
+            excelce = pd.concat([excelce, df], ignore_index=True)
 
-    async def change_date(self, driver, i):
+        excelce.to_excel(output_dir, index=False)
+
+    def change_date(self, driver, i):
         input_Od = driver.find_element(By.ID, 'FromDate')
         input_Do = driver.find_element(By.ID, 'ToDate')
         input_Do_value = input_Od.get_attribute('value')
@@ -66,10 +95,10 @@ class SaveDataFilter(Filter):
         input_Od.clear()
         input_Od.send_keys(prt)
 
-        print(date_Od, date_Do)
+        # print(date_Od, date_Do)
         time.sleep(3)
 
-        await click_button(driver)
+        click_button(driver)
 
     def html_df(self):
         html = pd.read_html('projectDAS/database/Историски податоци.xls')

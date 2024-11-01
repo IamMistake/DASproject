@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
+import concurrent.futures
 import time
+from math import ceil
 from datetime import datetime, timedelta
 import os
 from datetime import datetime
@@ -42,10 +44,12 @@ def check_existing_data(company_name):
     return False
 
 
-async def get_df(driver):
+def get_df(driver):
     html = driver.page_source
     soup = BeautifulSoup(html, 'html.parser')
     table = soup.select_one('#resultsTable')
+    if table is None:
+        return None
     trs = table.select('tbody > tr')
 
     df = {
@@ -77,12 +81,12 @@ async def get_df(driver):
     return tmp
 
 
-async def click_button(driver):
+def click_button(driver):
     btn = driver.find_element(By.CLASS_NAME, 'btn-primary-sm')
     btn.click()
 
 
-async def change_input_values(driver, last_date):
+def change_input_values(driver, last_date):
     input_Od = driver.find_element(By.ID, 'FromDate')
     input_Do = driver.find_element(By.ID, 'ToDate')
 
@@ -95,8 +99,15 @@ async def change_input_values(driver, last_date):
     input_Od.clear()
     input_Od.send_keys(tmp2)
 
+def get_driver():
+    url = 'https://www.mse.mk/mk/stats/symbolhistory/kmb'
+    # chrome_options = Options()
+    # driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome()
+    driver.get(url)
+    return driver
 
-async def change_company_code(driver, company):
+def change_company_code(driver, company):
     code_dropdown = Select(driver.find_element(By.ID, 'Code'))
     code_dropdown.select_by_value(company)
 
@@ -109,5 +120,5 @@ async def change_company_code(driver, company):
 
 
 class Filter:
-    async def process(self, driver, data):
+    def process(self, data):
         raise NotImplementedError("Each filter must implement!")

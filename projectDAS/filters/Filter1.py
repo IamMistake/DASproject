@@ -1,8 +1,10 @@
 from projectDAS.filters.Filter import *
 
 class CodeDownloaderFilter(Filter):
-    async def process(self, driver, date):
+    def process(self, date):
         print("Filter 1 starting...")
+
+        driver = get_driver()
 
         code_dropdown = driver.find_element(By.ID, 'Code')
         option_list = code_dropdown.find_elements(By.TAG_NAME, 'option')
@@ -10,7 +12,9 @@ class CodeDownloaderFilter(Filter):
             if not re.search(r'\d', option.text):
                 date.append(option.text)
 
-        return driver, date[:5]
+        driver.quit()
+
+        return date[:12]
 
 if __name__ == '__main__':
 
