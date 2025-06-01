@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: mse_stock_data
+      POSTGRES_USER: dians
+      POSTGRES_PASSWORD: dians123
+    volumes:
+      - postgres_mse_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U dians -d mse_stock_data" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: ./ScrapingService
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: mse_stock_data
+      DB_USER: dians
+      DB_PASSWORD: dians123
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python StartApp.py"
+
+  backend:
+    restart: always
+    build:
+      context: ./DesignAndArchitectureProject
+    container_name: dians_backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/mse_stock_data
+      SPRING_DATASOURCE_USERNAME: dians
+      SPRING_DATASOURCE_PASSWORD: dians123
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend
+
+volumes:
+  postgres_mse_data:

@@ -13,9 +13,6 @@ target/
 
 bin/
 *.log
-.mvn/
-mvnw
-mvnw.cmd
 .idea/
 *.iml
 
@@ -34,7 +31,6 @@ Thumbs.db
 .history/
 
 # Other
-*.env
 *.orig
 *.backup
 *.bak
