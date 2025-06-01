@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="../static/dashboardStyle.css">
+</head>
+<body>
+<div class="container">
+    <div class="sidebar">
+        <h2>UpTrendy</h2>
+            <label for="fromYear">From Year</label>
+            <select name="fromYear" id="fromYear">
+                <option selected value="2014">2014</option>
+                <option value="2015">2015</option>
+                <option value="2016">2016</option>
+                <option value="2017">2017</option>
+                <option value="2018">2018</option>
+                <option value="2019">2019</option>
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+            </select>
+
+            <label for="toYear">To Year</label>
+            <select name="toYear" id="toYear">
+                <option value="2015">2015</option>
+                <option value="2016">2016</option>
+                <option value="2017">2017</option>
+                <option value="2018">2018</option>
+                <option value="2019">2019</option>
+                <option value="2020">2020</option>
+                <option value="2021">2021</option>
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+                <option selected value="2024">2024</option>
+            </select>
+
+            <label for="company">Company</label>
+            <select name="companySelected" id="company">
+                <option selected value="ALK">ALK</option>
+            </select>
+
+            <button onclick="reloadData()">Add Filter</button>
+
+        <div class="news-section">
+            <h3>Latest News</h3>
+            <ul id="newsList"></ul>
+            <h1 id="loadingNews">Loading news...</h1>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="header">
+            <div>Min<br><span id="minValue">value</span></div>
+            <div>Max<br><span id="maxValue">value</span></div>
+            <div>Last Transaction Price<br><span id="lastPrice">value</span></div>
+            <div>Average<br><span id="average">value</span></div>
+            <div>Quantity Show<br><span id="quantity">value</span></div>
+        </div>
+
+        <div class="charts">
+            <canvas class="chart" id="lineChart"></canvas>
+            <div class="chart" id="statistics">
+                <div class="statistics">
+                    <h3>Осцилатори и Подвижни просеци (MA)</h3>
+                    <p>Осцилатори и Подвижни просеци се технички индикатори што се користат за анализа на историските цени и обем на тргување, цел да се предвидат и други на ново и да се донесат купување или продавање акции.</p>
+                    <ul>
+                        <li>Изберете 10 најдобри технички индикатори (Осцилатори и МА).</li>
+                        <li>Пресметајте ги нивните вредности во 3 временски рамки (1 ден, 1 недела, 1 месец).</li>
+                        <li>Генерирајте сигнали (купи, продај, задржи).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../static/scripts/dashboardScript.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+target/
+
+*.idea
+
+bin/
+*.log
+.mvn/
+mvnw
+mvnw.cmd
+.idea/
+*.iml
+
+# React specific
+node_modules/
+build/
+package-lock.json
+yarn.lock
+
+# OS or Editor specific
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.history/
+
+# Other
+*.env
+*.orig
+*.backup
+*.bak

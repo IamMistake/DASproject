@@ -1,0 +1,100 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    height: 100vh;
+}
+
+.sidebar {
+    background-color: #d8a15c;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.sidebar h2 {
+    text-align: center;
+    color: #000;
+}
+
+.sidebar select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+}
+
+.sidebar button {
+    padding: 10px;
+    background-color: #5e3e19;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+}
+
+.header {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.header div {
+    background-color: #d8a15c;
+    padding: 20px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.charts {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    height: 100%;
+}
+
+.chart {
+    background-color: #2b2b2b;
+    border-radius: 5px;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.header span {
+    color: black;
+    font-weight: bold;
+}
+
+.statistics {
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.statistics h3 {
+    color: #d8a15c;
+    margin-bottom: 10px;
+}
+
+.statistics ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.statistics ul li {
+    margin-bottom: 10px;
+}
