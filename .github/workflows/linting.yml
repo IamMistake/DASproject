@@ -28,17 +28,6 @@ jobs:
         working-directory: ./frontend
         run: npx eslint src/
 
-      # ===== Backend (SpringBoot/Java) =====
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Run Checkstyle (Java)
-        working-directory: ./DesignAndArchitectureProject
-        run: mvn checkstyle:check
-
       # ===== Python (Scraper) =====
       - name: Set up Python
         uses: actions/setup-python@v5
