@@ -9,6 +9,17 @@ jobs:
   sonarcloud-scan:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: dians
+          POSTGRES_PASSWORD: dians123
+          POSTGRES_DB: mse_stock_data
+        ports:
+          - 5433:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
