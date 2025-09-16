@@ -39,8 +39,9 @@ public class StockController {
 
     @GetMapping("/companies")
     public List<String> getCompanies() {
-        String url = "https://www.mse.mk/mk/stats/symbolhistory/kmb";
-        return Utils.extractDropdownOptions(url);
+//        String url = "https://www.mse.mk/mk/stats/symbolhistory/kmb";
+//        return Utils.extractDropdownOptions(url);
+        return List.of("KMB", "ALK", "SBT");
     }
 
     @GetMapping("/dashboard/news")
