@@ -52,6 +52,17 @@ interface StatisticsData {
     signals: string[];
 }
 
+interface ChartDataType {
+    labels: string[];
+    datasets: {
+        label: string;
+        data: number[];
+        borderColor: string;
+        backgroundColor: string;
+        tension: number;
+    }[];
+}
+
 const Dashboard: React.FC = () => {
     const [fromYear, setFromYear] = useState<string>('2014');
     const [toYear, setToYear] = useState<string>('2024');
@@ -60,7 +71,7 @@ const Dashboard: React.FC = () => {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [news, setNews] = useState<NewsItem | null>(null);
     const [statistics, setStatistics] = useState<StatisticsData | null>(null);
-    const [chartData, setChartData] = useState<object>(null);
+    const [chartData, setChartData] = useState<ChartDataType | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
