@@ -33,6 +33,6 @@ jobs:
 
       - name: Deploy Backend, Frontend, and Ingress
         run: |
-          kubectl apply -f kubernetes/backend-deployment.yml
-          kubectl apply -f kubernetes/frontend-deployment.yml
-          kubectl apply -f kubernetes/ingress.yml
+          kubectl apply -f kubernetes/backend-deployment.yaml
+          kubectl apply -f kubernetes/frontend-deployment.yaml
+          kubectl apply -f kubernetes/ingress.yaml
