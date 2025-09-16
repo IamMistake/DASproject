@@ -1,0 +1,44 @@
+name: CD to AKS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # Install Azure CLI
+      - name: Install Azure CLI
+        uses: azure/cli@v1
+        with:
+          inlineScript: ''
+
+      # Log in to Azure
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Configure kubectl for your AKS cluster
+      - name: Set AKS context
+        run: |
+          az aks get-credentials --resource-group dasproject-rg --name dasproject-aks --overwrite-existing
+
+      # Apply Kubernetes manifests
+      - name: Deploy Namespace and Postgres
+        run: |
+          kubectl apply -f kubernetes/namespace.yml
+          kubectl apply -f kubernetes/postgresDB.yml
+      
+          # Wait until postgres pod is ready
+          kubectl wait --namespace=dians --for=condition=ready pod -l app=postgres --timeout=120s
+
+      - name: Deploy Backend, Frontend, and Ingress
+        run: |
+          kubectl apply -f kubernetes/backend-deployment.yml
+          kubectl apply -f kubernetes/frontend-deployment.yml
+          kubectl apply -f kubernetes/ingress.yml
