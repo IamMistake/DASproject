@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api/stocks'; // Adjust port as needed
+const API_BASE_URL = 'http://backend:8080/api/stocks'; // Adjust port as needed
 
 export const fetchCompanies = async () => {
     const response = await axios.get(`${API_BASE_URL}/companies`);
