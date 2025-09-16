@@ -1,0 +1,39 @@
+name: Build and Push Docker Images
+on:
+  push:
+    branches: [ main, cicd ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ===== 1. Login to Docker Hub =====
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      # ===== 2. Build & Push SpringBoot Backend =====
+      - name: Build SpringBoot Docker image
+        working-directory: ./DesignAndArchitectureProject
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/dasproject-backend:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/dasproject-backend:latest
+
+      # ===== 3. Build & Push React Frontend =====
+      - name: Build React Docker image
+        working-directory: ./frontend
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/dasproject-frontend:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/dasproject-frontend:latest
+
+      # ===== 4. Build & Push Python Scraper =====
+      - name: Build Python Scraper Docker image
+        working-directory: ./ScrapingService
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/dasproject-scraper:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/dasproject-scraper:latest

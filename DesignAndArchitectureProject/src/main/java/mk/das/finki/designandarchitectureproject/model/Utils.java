@@ -5,18 +5,39 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Utils {
+
+    public static Document getDocumentWithSSL(String url) throws Exception {
+        // Create custom SSL context that trusts all certificates
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, new TrustManager[]{
+                new X509TrustManager() {
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                }
+        }, new java.security.SecureRandom());
+
+        // Use the custom SSL context
+        return Jsoup.connect(url)
+                .sslSocketFactory(sslContext.getSocketFactory())
+                .get();
+    }
 
     public static List<String> extractDropdownOptions(String url) {
         List<String> dates = new ArrayList<>();
 
         try {
             // Fetch the HTML content of the webpage
-            Document document = Jsoup.connect(url).get();
+            Document document = getDocumentWithSSL(url);
 
             // Select the dropdown element by its ID
             Element dropdown = document.selectFirst("#Code");
@@ -39,6 +60,8 @@ public class Utils {
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Failed to fetch the webpage.");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         return dates;

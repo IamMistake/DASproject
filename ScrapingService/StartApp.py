@@ -4,6 +4,7 @@ from config import DB_CONFIG
 import psycopg2
 
 def create_database_tables():
+
     """Create necessary tables in PostgreSQL if they don't exist"""
     conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
@@ -39,6 +40,7 @@ def create_database_tables():
     conn.close()
 
 if __name__ == '__main__':
+
     print("ScrapingPipeline starting...")
     create_database_tables()
 

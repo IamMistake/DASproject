@@ -1,4 +1,4 @@
-from filters.Filter import *
+from filters.Filter import Filter
 from bs4 import BeautifulSoup
 import requests
 import re
@@ -6,6 +6,7 @@ from config import DB_CONFIG
 import psycopg2
 
 class CodeDownloaderFilter(Filter):
+
     def process(self, data):
         print("Filter 1: Downloading issuer codes from MSE...")
 

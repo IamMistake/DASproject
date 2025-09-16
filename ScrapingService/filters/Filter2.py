@@ -1,16 +1,16 @@
-from filters.Filter import *
+from filters.Filter import Filter
 from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
 import concurrent.futures
 import os
-import re
 from config import DB_CONFIG
 import psycopg2
 from psycopg2.extras import execute_batch
 
 
 class SaveDataFilter(Filter):
+
     def process(self, issuers):
         print("Filter 2: Checking and saving issuer data...")
 

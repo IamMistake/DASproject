@@ -1,0 +1,139 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scraper-config
+  namespace: dians
+data:
+  POLL_INTERVAL: "30s"
+---
+# Secret for DB credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secrets
+  namespace: dians
+type: Opaque
+stringData:
+  POSTGRES_USER: dians
+  POSTGRES_PASSWORD: dians123
+---
+# Persistent Volume Claim for Postgres data
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-mse-pvc
+  namespace: dians
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+# Postgres Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: dians
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: mse_stock_data
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: POSTGRES_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata   # <--- this tells Postgres to use the subdirectory
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data   # PVC mounted here
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - dians
+                - -d
+                - mse_stock_data
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 5
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-mse-pvc
+---
+# Postgres Service (ClusterIP)
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: dians
+spec:
+  selector:
+    app: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: scraper-job
+  namespace: dians
+spec:
+  template:
+    spec:
+      restartPolicy: Never   # Important! Won’t restart if finished
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              echo "Waiting for Postgres..."
+              until nc -z postgres 5432; do
+                sleep 2
+              done
+              echo "Postgres is up"
+      containers:
+        - name: scraper
+          image: jagurinoski/dasproject-scraper:latest
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/mse_stock_data
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: POSTGRES_USER
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-secrets
+                  key: POSTGRES_PASSWORD
+  backoffLimit: 3   # Retry up to 3 times if it fails

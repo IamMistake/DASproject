@@ -1,6 +1,6 @@
 import os
 
-from filters.Filter import *
+from filters.Filter import Filter
 from datetime import datetime, timedelta
 import requests
 from bs4 import BeautifulSoup
@@ -11,6 +11,7 @@ from psycopg2.extras import execute_batch
 
 
 class DataCompletenessFilter(Filter):
+
     def process(self, last_dates):
         print("Filter 3: Completing missing data...")
 

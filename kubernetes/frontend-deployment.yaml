@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: dians
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+        - name: frontend
+          image: jagurinoski/dasproject-frontend:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: REACT_APP_BACKEND_URL  # or VUE_APP_BACKEND_URL
+              value: http://backend:8080     # points to backend service in the cluster
+            - name: VITE_API_BASE_URL
+              value: /api
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: dians
+spec:
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80            # Expose on port 80
+      targetPort: 80    # Maps to containerPort in Deployment
+      nodePort: 31553
+  type: LoadBalancer
