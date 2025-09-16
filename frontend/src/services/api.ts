@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/stocks';
+const API_BASE_URL = "http://20.253.48.183:8080/api/stocks";
 
 export const fetchCompanies = async () => {
     const response = await axios.get(`${API_BASE_URL}/companies`);
