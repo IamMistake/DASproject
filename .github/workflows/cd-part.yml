@@ -11,12 +11,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Install Azure CLI
-      - name: Install Azure CLI
-        uses: azure/cli@v1
-        with:
-          inlineScript: ''
-
       # Log in to Azure
       - name: Azure Login
         uses: azure/login@v1
@@ -33,7 +27,7 @@ jobs:
         run: |
           kubectl apply -f kubernetes/namespace.yml
           kubectl apply -f kubernetes/postgresDB.yml
-      
+          
           # Wait until postgres pod is ready
           kubectl wait --namespace=dians --for=condition=ready pod -l app=postgres --timeout=120s
 
